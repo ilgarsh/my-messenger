@@ -6,7 +6,6 @@ $klein = new \Klein\Klein();
 
 //Колбеки для API чатов
 $get_chats = function() {
-    /*$_SESSION['user'] = 'user1';*/
     Global $db;
     check_authorization();
     $username = $_SESSION['user'];
@@ -24,8 +23,6 @@ $get_chats = function() {
 };
 
 $create_chat = function () {
-    /*$_SESSION['user'] = 'user1';
-    $_POST['users'] = json_encode(['user1','user2','user6','user7']);*/
     Global $db;
     check_authorization();
     if (!isset($_POST['users']) || empty($_POST['users'])) {
@@ -93,7 +90,6 @@ $get_chat = function ($request) {
 };
 
 $delete_chat = function ($request) {
-    //$_SESSION['user'] = 'user1';
     Global $redis;
     Global $db;
     check_authorization();
@@ -171,7 +167,8 @@ $login = function () {
     }
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $password_from_db = "SELECT password FROM users WHERE username = '$username'";
+    $result = $db->query("SELECT password FROM users WHERE username = '$username'");
+    $password_from_db = $result->fetch_row()[0];
     if (password_verify($password, $password_from_db)) {
         $_SESSION['user'] = $username;
         $resp->success = true;
