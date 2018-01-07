@@ -136,12 +136,18 @@ $create_message = function ($request) {
     return json_encode($resp);
 };
 
+//API для чатов
 $klein->respond('GET', '/chats', $get_chats); //получить список чатов для текущего пользователя
 $klein->respond('GET', '/chats/[i:id]/users', $get_chat_users); //получать список пользователей чата по id
 $klein->respond('GET', '/chats/[i:id]/', $get_chat); //получать список сообщений чата по id по параметру numb
 $klein->respond('POST', '/chats', $create_chat); //добавить чат
 $klein->respond("POST", "/chats/[i:id]/message", $create_message); //создать сообщение в редис
 $klein->respond('DELETE', '/chats/[i:id]', $delete_chat); //удалить чат по id
+
+//API для авторизации
+$klein->respond('POST', '/registration', $registration_user);
+$klein->respond('POST', '/login', $login);
+$klein->respond('GET', '/logout', $logout);
 
 
 $klein->dispatch();
