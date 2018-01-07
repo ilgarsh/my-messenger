@@ -4,6 +4,7 @@ require_once 'helper.php';
 
 $klein = new \Klein\Klein();
 
+//Колбеки для API чатов
 $get_chats = function() {
     /*$_SESSION['user'] = 'user1';*/
     Global $db;
@@ -134,6 +135,57 @@ $create_message = function ($request) {
     $resp->success = true;
     $resp->error = null;
     return json_encode($resp);
+};
+
+//Колбеки для API авторизации
+$registration_user = function () {
+    Global $db;
+    if (!isset($_POST['username'])
+            || !isset($_POST['password'])) {
+        $resp->success = false;
+        $resp->error = 'not valid data';
+        return json_encode($resp);
+    }
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $insert = "INSERT INTO users VALUES($username, $hashed_password)";
+    if ($db->query($insert) == TRUE) {
+        $resp->success = true;
+        $resp->error = null;
+        return json_encode($resp);
+    } else {
+        $resp->success = false;
+        $resp->error = "the row was not added in db";
+        return json_encode($resp);
+    }
+};
+
+$login = function () {
+    Global $db;
+    if (!isset($_POST['username'])
+        || !isset($_POST['password'])) {
+        $resp->success = false;
+        $resp->error = 'not valid data in post\'s headers';
+        return json_encode($resp);
+    }
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $password_from_db = "SELECT password FROM users WHERE username = '$username'";
+    if (password_verify($password, $password_from_db)) {
+        $_SESSION['user'] = $username;
+        $resp->success = true;
+        $resp->error = null;
+        return json_encode($resp);
+    } else {
+        $resp->success = false;
+        $resp->error = 'incorrect password or username';
+        return json_encode($resp);
+    }
+};
+
+$logout = function () {
+    $_SESSION['user'] = null;
 };
 
 //API для чатов
