@@ -1,4 +1,4 @@
-<?php
+	<?php
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'helper.php';
 
@@ -7,7 +7,9 @@ $klein = new \Klein\Klein();
 //Колбеки для API чатов
 $get_chats = function() {
     Global $db;
-    check_authorization();
+    if (check_authorization()) {
+        return build_unauthorized_access();
+    }
     $username = $_SESSION['user'];
     $sql = "SELECT chat_id FROM chats WHERE username = '$username'";
     $result = $db -> query($sql);
@@ -24,7 +26,9 @@ $get_chats = function() {
 
 $create_chat = function () {
     Global $db;
-    check_authorization();
+    if (check_authorization()) {
+        return build_unauthorized_access();
+    }
     if (!isset($_POST['users']) || empty($_POST['users'])) {
         $resp->success = false;
         $resp->chat_id = null;
@@ -54,7 +58,9 @@ $create_chat = function () {
 $get_chat_users = function ($request) {
     $_SESSION['user'] = 'user1';
     Global $db;
-    check_authorization();
+    if (check_authorization()) {
+        return build_unauthorized_access();
+    }
     $chat_id = $request->id;
     $username = $_SESSION['user'];
     $rows = $db->query("SELECT * FROM chats WHERE chat_id = $chat_id AND username = '$username'");
@@ -78,7 +84,9 @@ $get_chat_users = function ($request) {
 
 $get_chat = function ($request) {
     Global $redis;
-    check_authorization();
+    if (check_authorization()) {
+        return build_unauthorized_access();
+    }
     $chat_id = $request->id;
     $n_last_messages = 10;
     if (isset($_GET['numb'])) {
@@ -92,7 +100,9 @@ $get_chat = function ($request) {
 $delete_chat = function ($request) {
     Global $redis;
     Global $db;
-    check_authorization();
+    if (check_authorization()) {
+        return build_unauthorized_access();
+    }
     $chat_id = $request->id;
     $username = $_SESSION['user'];
     $rows = $db->query("SELECT * FROM chats WHERE chat_id = $chat_id AND username = '$username'");
@@ -117,7 +127,10 @@ $delete_chat = function ($request) {
 
 $create_message = function ($request) {
     Global $redis;
-    check_authorization();
+    if (check_authorization()) {
+        return build_unauthorized_access();
+    }
+    $_POST['message'] = "hello";
     if (!isset($_POST['message']) || empty($_POST['message'])) {
         $resp->success = false;
         $resp->error = 'empty message';
